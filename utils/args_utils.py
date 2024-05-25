@@ -26,6 +26,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weight_decay", type=float, default=5e-4)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--num_gpus", type=int, default=1)
+    parser.add_argument("--num_workers", type=int, default=8)
 
     parser.add_argument("--num_classes", type=int, default=100)
     parser.add_argument("--dim_feature", type=int, default=2048)

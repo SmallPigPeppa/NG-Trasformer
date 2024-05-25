@@ -25,10 +25,12 @@ def main():
     # model.encoder = encoder
     # dataset
     train_dataset, test_dataset = get_dataset(dataset=args.dataset, data_path=args.data_path)
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
+                              shuffle=True, pin_memory=True)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
+                             shuffle=True, pin_memory=True)
 
-    #trainer
+    # trainer
     wandb_logger = WandbLogger(
         name=f"{args.dataset}-{args.run_name}",
         project=args.project,

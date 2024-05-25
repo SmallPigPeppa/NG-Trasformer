@@ -22,7 +22,7 @@ class MLP(pl.LightningModule):
         self.encoder = None
 
         # Initialize energy values
-        self.energy_values = torch.tensor(np.random.normal(size=num_class), dtype=torch.float32)
+        self.energy_values = torch.tensor(np.random.normal(size=num_class), dtype=torch.float32, device=self.device)
 
     def init_encoder(self):
         encoder = resnet50()
@@ -54,7 +54,7 @@ class MLP(pl.LightningModule):
         with torch.no_grad():
             x = self.encoder(x)
         out = self.fc(x)
-
+        self.energy_values.to(self.device)
         # Sort the output and assign energy values
         sorted_indices = torch.argsort(out, dim=1, descending=True).to(self.device)
         # sorted_out = torch.gather(out, 1, sorted_indices)

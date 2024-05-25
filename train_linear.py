@@ -22,7 +22,7 @@ def main():
         encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=True)
     else:
         encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=False)
-    encoder.val()
+    encoder.eval()
     model.encoder = encoder
     # model.init_encoder()
 

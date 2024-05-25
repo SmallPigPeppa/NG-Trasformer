@@ -4,6 +4,7 @@ from torch import nn
 from torch.nn import functional as F
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 from torchvision.models import resnet50
+from torchmetrics.classification.accuracy import Accuracy
 
 
 class MLP(pl.LightningModule):
@@ -16,27 +17,28 @@ class MLP(pl.LightningModule):
         self.warmup_epochs = warmup_epochs
         self.extra_args = kwargs
         self.fc = nn.Linear(dim_feature, num_classes)
+        self.acc = Accuracy(num_classes, task="multiclass", top_k=1)
         self.encoder = None
 
-    # def init_encoder(self):
-    #     encoder = resnet50()
-    #     if "cifar" in self.extra_args['dataset']:
-    #         encoder.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
-    #         encoder.maxpool = nn.Identity()
-    #
-    #     state = torch.load(self.extra_args['pretrain_ckpt'], map_location="cpu")["state_dict"]
-    #     for k in list(state.keys()):
-    #         if "encoder" in k:
-    #             state[k.replace("encoder.", "")] = state[k]
-    #         if "backbone" in k:
-    #             state[k.replace("backbone.", "")] = state[k]
-    #         del state[k]
-    #
-    #     encoder.fc = nn.Identity()
-    #     encoder.load_state_dict(state, strict=False)
-    #     print(f"Loaded {self.extra_args['pretrain_ckpt']}")
-    #     # self.encoder = encoder.eval()
-    #     self.encoder = encoder
+    def init_encoder(self):
+        encoder = resnet50()
+        if "cifar" in self.extra_args['dataset']:
+            encoder.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
+            encoder.maxpool = nn.Identity()
+
+        state = torch.load(self.extra_args['pretrain_ckpt'], map_location="cpu")["state_dict"]
+        for k in list(state.keys()):
+            if "encoder" in k:
+                state[k.replace("encoder.", "")] = state[k]
+            if "backbone" in k:
+                state[k.replace("backbone.", "")] = state[k]
+            del state[k]
+
+        encoder.fc = nn.Identity()
+        encoder.load_state_dict(state, strict=False)
+        print(f"Loaded {self.extra_args['pretrain_ckpt']}")
+        # self.encoder = encoder.eval()
+        self.encoder = encoder
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(), lr=self.lr)
@@ -57,7 +59,7 @@ class MLP(pl.LightningModule):
         ce_loss = F.cross_entropy(logits, targets)
         # acc
         preds = torch.argmax(logits, dim=1)
-        acc = torch.sum(preds == targets) / targets.shape[0]
+        acc = self.acc(preds, targets)
         return {"acc": acc, "loss": ce_loss}
 
     def training_step(self, batch, batch_idx):

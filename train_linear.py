@@ -17,26 +17,15 @@ def main():
 
     # model
     model = MLP(**args.__dict__)
-
-    if "cifar" in args.dataset:
-        encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=True)
-    else:
-        encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=False)
-    encoder.eval()
-    model.encoder = encoder
-    # model.init_encoder()
+    model.init_encoder()
 
     # dataset
     train_dataset, test_dataset = get_dataset(dataset=args.dataset, data_path=args.data_path)
-    # train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
-    #                           shuffle=True, pin_memory=True)
-    # test_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
-    #                          shuffle=True, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
+                              shuffle=True, pin_memory=True)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
+                             shuffle=False, pin_memory=True)
 
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size,
-                              shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size,
-                             shuffle=True)
 
     # trainer
     wandb_logger = WandbLogger(

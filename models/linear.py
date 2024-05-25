@@ -18,25 +18,25 @@ class MLP(pl.LightningModule):
         self.fc = nn.Linear(dim_feature, num_classes)
         self.encoder = None
 
-    def init_encoder(self):
-        encoder = resnet50()
-        if "cifar" in self.extra_args['dataset']:
-            encoder.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
-            encoder.maxpool = nn.Identity()
-
-        state = torch.load(self.extra_args['pretrain_ckpt'], map_location="cpu")["state_dict"]
-        for k in list(state.keys()):
-            if "encoder" in k:
-                state[k.replace("encoder.", "")] = state[k]
-            if "backbone" in k:
-                state[k.replace("backbone.", "")] = state[k]
-            del state[k]
-
-        encoder.fc = nn.Identity()
-        encoder.load_state_dict(state, strict=False)
-        print(f"Loaded {self.extra_args['pretrain_ckpt']}")
-        # self.encoder = encoder.eval()
-        self.encoder = encoder
+    # def init_encoder(self):
+    #     encoder = resnet50()
+    #     if "cifar" in self.extra_args['dataset']:
+    #         encoder.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
+    #         encoder.maxpool = nn.Identity()
+    #
+    #     state = torch.load(self.extra_args['pretrain_ckpt'], map_location="cpu")["state_dict"]
+    #     for k in list(state.keys()):
+    #         if "encoder" in k:
+    #             state[k.replace("encoder.", "")] = state[k]
+    #         if "backbone" in k:
+    #             state[k.replace("backbone.", "")] = state[k]
+    #         del state[k]
+    #
+    #     encoder.fc = nn.Identity()
+    #     encoder.load_state_dict(state, strict=False)
+    #     print(f"Loaded {self.extra_args['pretrain_ckpt']}")
+    #     # self.encoder = encoder.eval()
+    #     self.encoder = encoder
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(), lr=self.lr)

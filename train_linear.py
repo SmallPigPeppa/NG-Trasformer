@@ -17,9 +17,9 @@ def main():
 
     # model
     if "cifar" in args.dataset:
-        encoder = get_pretrained_encoder(args.pretrained_model, cifar=True)
+        encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=True)
     else:
-        encoder = get_pretrained_encoder(args.pretrained_model, cifar=False)
+        encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=False)
 
     model = MLP(**args.__dict__)
     model.encoder = encoder

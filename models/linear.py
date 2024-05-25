@@ -17,7 +17,7 @@ class MLP(pl.LightningModule):
         self.warmup_epochs = warmup_epochs
         self.extra_args = kwargs
         self.fc = nn.Linear(dim_feature, num_class)
-        self.acc = Accuracy(num_class, task="multiclass", top_k=1)
+        self.acc = Accuracy(num_classes=self.num_class, task="multiclass", top_k=1)
         self.encoder = None
 
     def init_encoder(self):

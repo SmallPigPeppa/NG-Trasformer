@@ -35,7 +35,7 @@ class MLP(pl.LightningModule):
         encoder.fc = nn.Identity()
         encoder.load_state_dict(state, strict=False)
         print(f"Loaded {self.extra_args['pretrain_ckpt']}")
-        self.encoder = encoder.eval()
+        # self.encoder = encoder.eval()
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(), lr=self.lr)

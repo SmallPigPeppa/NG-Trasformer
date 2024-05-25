@@ -5,6 +5,7 @@ from torch.nn import functional as F
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 from torchvision.models import resnet50
 from torchmetrics.classification.accuracy import Accuracy
+import numpy as np
 
 
 class MLP(pl.LightningModule):
@@ -19,6 +20,9 @@ class MLP(pl.LightningModule):
         self.fc = nn.Linear(dim_feature, num_class)
         self.acc = Accuracy(num_classes=num_class, task="multiclass", top_k=1)
         self.encoder = None
+
+        # Initialize energy values
+        self.energy_values = torch.tensor(np.random.normal(size=num_class), dtype=torch.float32)
 
     def init_encoder(self):
         encoder = resnet50()
@@ -50,7 +54,16 @@ class MLP(pl.LightningModule):
         with torch.no_grad():
             x = self.encoder(x)
         out = self.fc(x)
-        return out
+
+        # Sort the output and assign energy values
+        sorted_indices = torch.argsort(out, dim=1, descending=True)
+        # sorted_out = torch.gather(out, 1, sorted_indices)
+        assigned_energies = torch.gather(self.energy_values.expand(out.size(0), -1), 1, sorted_indices)
+
+        # Normalize the assigned energies with softmax
+        normalized_energies = F.softmax(assigned_energies, dim=1)
+
+        return normalized_energies
 
     def share_step(self, batch, batch_idx):
         x, targets = batch

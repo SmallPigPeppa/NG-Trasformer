@@ -8,7 +8,7 @@ from utils.dataset_utils import get_dataset
 from pytorch_lightning.callbacks import LearningRateMonitor
 from utils.encoder_utils import get_pretrained_encoder
 from utils.args_utils import parse_args
-from models.linear import MLP
+from models.linear_ng import MLP
 
 
 def main():

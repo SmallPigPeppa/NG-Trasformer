@@ -18,7 +18,7 @@ class MLP(pl.LightningModule):
         self.fc = nn.Linear(dim_feature, num_classes)
         self.encoder = None
 
-    def on_train_epoch_start(self):
+    def init_encoder(self):
         encoder = resnet50()
         if "cifar" in self.extra_args['dataset']:
             encoder.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)

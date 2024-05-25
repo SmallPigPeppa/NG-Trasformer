@@ -15,14 +15,14 @@ def main():
     seed_everything(5)
     args = parse_args()
 
-    # model
-    if "cifar" in args.dataset:
-        encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=True)
-    else:
-        encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=False)
+    # # model
+    # if "cifar" in args.dataset:
+    #     encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=True)
+    # else:
+    #     encoder = get_pretrained_encoder(args.pretrain_ckpt, cifar=False)
 
     model = MLP(**args.__dict__)
-    model.encoder = encoder
+    # model.encoder = encoder
     # dataset
     train_dataset, test_dataset = get_dataset(dataset=args.dataset, data_path=args.data_path)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)

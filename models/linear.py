@@ -11,13 +11,13 @@ class MLP(pl.LightningModule):
     def __init__(self, dim_feature, num_class, lr, epochs, warmup_epochs, **kwargs):
         super(MLP, self).__init__()
         self.dim_feature = dim_feature
-        self.num_calss = num_class
+        self.num_class = num_class
         self.lr = lr
         self.epochs = epochs
         self.warmup_epochs = warmup_epochs
         self.extra_args = kwargs
         self.fc = nn.Linear(dim_feature, num_class)
-        self.acc = Accuracy(num_classes=self.num_class, task="multiclass", top_k=1)
+        self.acc = Accuracy(num_classes=num_class, task="multiclass", top_k=1)
         self.encoder = None
 
     def init_encoder(self):

@@ -7,14 +7,14 @@ data, _ = make_moons(10000, noise=0.06, random_state=0)
 plt.scatter(*data.T)
 plt.show()
 
-from tqdm import tqdm_notebook as tqdm
+from tqdm.notebook import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from IPython.display import HTML
 from neupy import algorithms, utils
 
-utils.reproducible()
+# utils.reproducible()
 
 gng = algorithms.GrowingNeuralGas(
     n_inputs=2,

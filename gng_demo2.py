@@ -10,7 +10,7 @@ result_dir = 'result'
 os.makedirs(result_dir, exist_ok=True)
 
 # Generate moon dataset
-data, _ = make_moons(10000, noise=0.06, random_state=0)
+data, _ = make_moons(1000, noise=0.06, random_state=0)
 plt.scatter(*data.T)
 plt.show()
 

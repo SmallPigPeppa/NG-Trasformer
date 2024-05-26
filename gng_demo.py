@@ -14,7 +14,7 @@ import matplotlib.animation as animation
 from IPython.display import HTML
 from neupy import algorithms, utils
 
-# utils.reproducible()
+utils.reproducible()
 
 gng = algorithms.GrowingNeuralGas(
     n_inputs=2,

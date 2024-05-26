@@ -2,7 +2,7 @@ from neupy import algorithms
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_moons
 import os
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 import numpy as np
 
 # Create result directory if it doesn't exist

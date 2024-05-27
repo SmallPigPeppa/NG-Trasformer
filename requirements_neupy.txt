@@ -2,3 +2,4 @@ numpy==1.19.5
 neupy
 ipython
 ipywidgets
+matplotlib

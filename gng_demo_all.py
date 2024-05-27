@@ -107,10 +107,16 @@ def animate_gng(data, labels, gng, distribution_dir):
         animate.prev_lines = lines
         return lines
 
+    # animate.prev_lines = []
+    # anim = animation.FuncAnimation(fig, animate, tqdm(np.arange(220)), interval=30, blit=True)
+    # anim.save(os.path.join(distribution_dir, 'gng_animation.mp4'), writer='ffmpeg', fps=30)
+    # return HTML(anim.to_html5_video())
+
     animate.prev_lines = []
     anim = animation.FuncAnimation(fig, animate, tqdm(np.arange(220)), interval=30, blit=True)
-    anim.save(os.path.join(distribution_dir, 'gng_animation.mp4'), writer='ffmpeg', fps=30)
-    return HTML(anim.to_html5_video())
+    anim.save(os.path.join(distribution_dir, 'gng_animation.gif'), writer='imagemagick', fps=30)
+    return HTML(anim.to_jshtml())
+
 
 
 if __name__ == "__main__":
@@ -124,6 +130,6 @@ if __name__ == "__main__":
 
         data, labels = generate_data(distribution_type)
         plot_and_save_distribution(data, labels, distribution_type, distribution_dir)
-        #
-        # gng = initialize_gng()
-        # animate_gng(data, labels, gng, distribution_dir)
+
+        gng = initialize_gng()
+        animate_gng(data, labels, gng, distribution_dir)

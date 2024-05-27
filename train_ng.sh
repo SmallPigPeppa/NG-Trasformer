@@ -3,7 +3,7 @@ python train_linear_ng.py \
       --data_path /ppio_net0/torch_ds \
       --dataset cifar100 \
       --epochs 30 \
-      --lr 0.1 \
+      --lr 20 \
       --batch_size 256 \
       --num_gpus 1 \
       --num_workers 8 \

@@ -28,42 +28,19 @@ class ModifiedVisionTransformer(VisionTransformer):
         x = blk(x)
         return x
 
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = x + self.drop_path1(self.ls1(self.attn(self.norm1(x))))
+        x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
+        return x
+
     def forward_block_with_filter_old(self, blk, x):
         # Apply normalization
-        x_norm = blk.norm1(x)
-
-        # Compute attention with some probabilities set to zero
-        B, N, C = x_norm.shape
-        qkv = blk.attn.qkv(x_norm).reshape(B, N, 3, blk.attn.num_heads, blk.attn.head_dim).permute(2, 0, 3, 1, 4)
-        q, k, v = qkv.unbind(0)
-        q, k = blk.attn.q_norm(q), blk.attn.k_norm(k)
-
-        q = q * blk.attn.scale
-        attn = q @ k.transpose(-2, -1)
-
-        # Softmax to get attention probabilities
-        attn = attn.softmax(dim=-1)
-
-        # Set the smallest 20% of the attention probabilities to 0
-        k_threshold = int(attn.numel() * self.keep_ratio)
-        threshold_values, _ = torch.topk(attn.view(-1), k_threshold, largest=False)
-        threshold_value = threshold_values.max()
-        attn = torch.where(attn < threshold_value, torch.tensor(0.0).to(attn.device), attn)
-
-        attn = blk.attn.attn_drop(attn)
-        x_attn = attn @ v
-
-        x_attn = x_attn.transpose(1, 2).reshape(B, N, C)
-        x_attn = blk.attn.proj(x_attn)
-        x_attn = blk.attn.proj_drop(x_attn)
-
-        # Add residual and apply drop path
-        x = x + blk.drop_path1(blk.ls1(x_attn))
+        x_norm1 = blk.norm1(x)
+        x_attn = blk.attn(x_norm1)
+        x = x + self.drop_path1(self.ls1(x_attn))
 
         # MLP part
-        x_norm2 = blk.norm2(x)
-        x_mlp = blk.mlp(x_norm2)
-        x = x + blk.drop_path2(blk.ls2(x_mlp))
+        x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
 
         return x
 

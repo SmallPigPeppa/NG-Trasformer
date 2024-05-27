@@ -19,7 +19,7 @@ class ModifiedVisionTransformer(VisionTransformer):
         for block in self.blocks:
             x = self.forward_block_with_filter(block, x)
 
-        return self.norm(x[:, 0])
+        return self.norm(x)
 
     def forward_block_with_filter(self, blk, x):
         x = blk.norm1(x)

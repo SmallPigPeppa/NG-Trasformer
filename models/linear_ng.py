@@ -47,7 +47,7 @@ class MLP(pl.LightningModule):
         transformed_energy_values = transformed_energy_values / np.sum(transformed_energy_values)
 
         # 转换为torch tensor
-        self.energy_values = torch.tensor(transformed_energy_values, dtype=torch.float32, device=self.device)
+        self.energy_values = torch.tensor(transformed_energy_values*30, dtype=torch.float32, device=self.device)
 
     def init_encoder(self):
         encoder = resnet50()

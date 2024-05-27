@@ -18,7 +18,7 @@ transformed_energy_values = np.exp(sorted_values / temperature)
 transformed_energy_values = transformed_energy_values / np.sum(transformed_energy_values)
 
 # 转换为torch tensor
-energy_values_tensor = torch.tensor(transformed_energy_values, dtype=torch.float32)
+energy_values_tensor = torch.tensor(transformed_energy_values*30, dtype=torch.float32)
 
 # 打印生成的能量值
 print(energy_values_tensor)

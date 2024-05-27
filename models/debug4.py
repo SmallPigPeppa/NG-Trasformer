@@ -3,6 +3,7 @@ import torch.nn as nn
 import timm
 from timm.models.vision_transformer import VisionTransformer
 from timm import create_model
+from timm.models._manipulate import checkpoint_seq
 
 
 class ModifiedVisionTransformer(VisionTransformer):
@@ -10,42 +11,56 @@ class ModifiedVisionTransformer(VisionTransformer):
         super(ModifiedVisionTransformer, self).__init__(*args, **kwargs)
         self.keep_ratio = keep_ratio
 
-    def forward_features(self, x):
+
+    def forward_features(self, x: torch.Tensor) -> torch.Tensor:
         x = self.patch_embed(x)
-        cls_token = self.cls_token.expand(x.shape[0], -1, -1)
-        x = torch.cat((cls_token, x), dim=1)
-        x = self.pos_drop(x + self.pos_embed)
-
-        for block in self.blocks:
-            x = self.forward_block_with_filter(block, x)
-
-        return self.norm(x)
+        x = self._pos_embed(x)
+        x = self.patch_drop(x)
+        x = self.norm_pre(x)
+        if self.grad_checkpointing and not torch.jit.is_scripting():
+            x = checkpoint_seq(self.blocks, x)
+        else:
+            for block in self.blocks:
+                x = self.forward_block_with_filter(block, x)
+        x = self.norm(x)
+        return x
 
     def forward_block_with_filter(self, blk, x):
-        x = blk.norm1(x)
-        qkv = blk.attn.qkv(x).reshape(x.shape[0], x.shape[1], 3, blk.attn.num_heads, blk.attn.head_dim)
-        q, k, v = qkv[:, :, 0], qkv[:, :, 1], qkv[:, :, 2]
+        # Apply normalization
+        x_norm = blk.norm1(x)
 
-        attn = (q @ k.transpose(-2, -1)) * blk.attn.scale
+        # Compute attention with some probabilities set to zero
+        B, N, C = x_norm.shape
+        qkv = blk.attn.qkv(x_norm).reshape(B, N, 3, blk.attn.num_heads, blk.attn.head_dim).permute(2, 0, 3, 1, 4)
+        q, k, v = qkv.unbind(0)
+        q, k = blk.attn.q_norm(q), blk.attn.k_norm(k)
+
+        q = q * blk.attn.scale
+        attn = q @ k.transpose(-2, -1)
+
+        # Softmax to get attention probabilities
         attn = attn.softmax(dim=-1)
 
-        # 筛选前 keep_ratio 的注意力权重
-        sorted_attn, indices = torch.sort(attn, dim=-1, descending=True)
-        threshold_index = int(sorted_attn.shape[-1] * self.keep_ratio)
-        mask = torch.arange(sorted_attn.shape[-1]).expand_as(sorted_attn) < threshold_index
-        mask = mask.to(attn.device)
+        # Set the smallest 20% of the attention probabilities to 0
+        k_threshold = int(attn.numel() * self.keep_ratio)
+        threshold_values, _ = torch.topk(attn.view(-1), k_threshold, largest=False)
+        threshold_value = threshold_values.max()
+        attn = torch.where(attn < threshold_value, torch.tensor(0.0).to(attn.device), attn)
 
-        # 将低于阈值的权重设置为0
-        attn[~mask] = 0
-        attn = attn / attn.sum(dim=-1, keepdim=True)  # 重新归一化权重
+        attn = blk.attn.attn_drop(attn)
+        x_attn = attn @ v
 
-        x = (attn @ v).transpose(1, 2).reshape(x.shape[0], x.shape[1], blk.attn.num_heads * blk.attn.head_dim)
-        x = blk.attn.proj(x)
+        x_attn = x_attn.transpose(1, 2).reshape(B, N, C)
+        x_attn = blk.attn.proj(x_attn)
+        x_attn = blk.attn.proj_drop(x_attn)
 
-        x = blk.drop_path1(x) + x
-        x = blk.norm2(x)
-        x = blk.mlp(x)
-        x = blk.drop_path2(x) + x
+        # Add residual and apply drop path
+        x = x + blk.drop_path1(blk.ls1(x_attn))
+
+        # MLP part
+        x_norm2 = blk.norm2(x)
+        x_mlp = blk.mlp(x_norm2)
+        x = x + blk.drop_path2(blk.ls2(x_mlp))
 
         return x
 

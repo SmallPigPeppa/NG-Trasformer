@@ -62,8 +62,12 @@ class MLP(pl.LightningModule):
 
         # Normalize the assigned energies with softmax
         normalized_energies = F.softmax(assigned_energies, dim=1)
+        # return normalized_energies
 
-        return normalized_energies
+        y = out - out.detach() + normalized_energies
+        return y
+
+
 
     def share_step(self, batch, batch_idx):
         x, targets = batch

@@ -59,7 +59,8 @@ def create_modified_vitb16(keep_ratio=0.8):
     orig_net = create_model(weights, pretrained=True)
     state_dict = orig_net.state_dict()
     model.load_state_dict(state_dict, strict=True)
-    return model
+    return orig_net
+    # return model
 
 
 # 创建模型

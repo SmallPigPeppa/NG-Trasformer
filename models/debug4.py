@@ -25,18 +25,17 @@ class ModifiedVisionTransformer(VisionTransformer):
         x = self.norm(x)
         return x
 
-    def forward_block_with_filter(self, blk, x):
+    def forward_block_with_filter_origin(self, blk, x):
         x = blk(x)
         return x
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = x + self.drop_path1(self.ls1(self.attn(self.norm1(x))))
-        x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
-        return x
+    # def forward(self, x: torch.Tensor) -> torch.Tensor:
+    #     x = x + self.drop_path1(self.ls1(self.attn(self.norm1(x))))
+    #     x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
+    #     return x
 
-    def forward_block_with_filter_old(self, blk, x):
-
-        def filter_attn(x):
+    def forward_block_with_filter(self, blk, x):
+        def _filter_attn(x):
             attn_model = blk.attn
             B, N, C = x.shape
             qkv = attn_model.qkv(x).reshape(B, N, 3, attn_model.num_heads, attn_model.head_dim).permute(2, 0, 3, 1, 4)
@@ -62,7 +61,7 @@ class ModifiedVisionTransformer(VisionTransformer):
 
 
         # x = x + self.drop_path1(self.ls1(self.attn(self.norm1(x))))
-        x_attn = filter_attn(blk.norm1(x))
+        x_attn = _filter_attn(blk.norm1(x))
         x = x + self.drop_path1(self.ls1(x_attn))
 
         # x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))

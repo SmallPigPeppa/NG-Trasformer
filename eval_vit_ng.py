@@ -28,7 +28,7 @@ def main():
     # test_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
     #                          shuffle=False, pin_memory=True)
 
-    data_config = timm.data.resolve_model_data_config(model.encoder)
+    data_config = timm.data.resolve_model_data_config(model.orig_net)
     val_transform = timm.data.create_transform(**data_config, is_training=False)
     val_dataset = datasets.ImageFolder(root=os.path.join(args.data_path, 'val'), transform=val_transform)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.num_workers,

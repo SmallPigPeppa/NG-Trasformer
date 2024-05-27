@@ -75,7 +75,7 @@ def create_modified_vitb16(keep_ratio=0.8):
     state_dict = orig_net.state_dict()
     model.load_state_dict(state_dict, strict=True)
     # return orig_net
-    return model
+    return model,orig_net
 
 
 # 创建模型

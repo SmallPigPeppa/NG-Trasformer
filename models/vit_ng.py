@@ -41,7 +41,7 @@ class ViT_NG(pl.LightningModule):
         # print(f"Loaded {self.extra_args['pretrain_ckpt']}")
         # # self.encoder = encoder.eval()
 
-        self.encoder = create_modified_vitb16(keep_ratio=1.0)
+        self.encoder, self.orig_net = create_modified_vitb16(keep_ratio=1.0)
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(), lr=self.lr)

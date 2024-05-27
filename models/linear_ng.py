@@ -57,8 +57,8 @@ class MLP(pl.LightningModule):
         # self.energy_values.to(self.device)
         # Sort the output and assign energy values
         sorted_indices = torch.argsort(out, dim=1, descending=True)
-        # sorted_out = torch.gather(out, 1, sorted_indices)
         assigned_energies = torch.gather(self.energy_values.expand(out.size(0), -1).to(self.device), 1, sorted_indices)
+        assigned_energies = assigned_energies * 10000
 
         # Normalize the assigned energies with softmax
         normalized_energies = F.softmax(assigned_energies, dim=1)

@@ -36,7 +36,7 @@ class MLP(pl.LightningModule):
 
         # 设置随机种子以确保结果可重复
         num_class = 100
-        temperature = 0.3  # 调整温度系数
+        temperature = 0.1  # 调整温度系数
 
         # 生成随机值并排序
         raw_values = np.random.uniform(size=num_class)

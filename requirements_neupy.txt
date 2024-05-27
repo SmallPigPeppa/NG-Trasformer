@@ -3,4 +3,4 @@ neupy
 ipython
 ipywidgets
 matplotlib
-sklearn
+scikit-learn

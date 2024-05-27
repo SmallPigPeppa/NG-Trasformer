@@ -31,6 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num_class", type=int, default=100)
     parser.add_argument("--dim_feature", type=int, default=2048)
     parser.add_argument("--tau", type=float, default=1.0)
+    parser.add_argument("--keep_ratio", type=float, default=1.0)
     parser.add_argument("--pretrain_ckpt", type=str, default="")
 
     # parse args

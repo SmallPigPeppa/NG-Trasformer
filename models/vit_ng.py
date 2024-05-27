@@ -9,7 +9,7 @@ from .debug4 import create_modified_vitb16
 
 
 class ViT_NG(pl.LightningModule):
-    def __init__(self, dim_feature, num_class, lr, epochs, warmup_epochs, **kwargs):
+    def __init__(self, dim_feature, num_class, lr, epochs, warmup_epochs, keep_ratio, **kwargs):
         super(ViT_NG, self).__init__()
         self.dim_feature = dim_feature
         self.num_class = num_class
@@ -21,6 +21,7 @@ class ViT_NG(pl.LightningModule):
         self.fc = nn.Identity()
         self.acc = Accuracy(num_classes=num_class, task="multiclass", top_k=1)
         self.encoder = None
+        self.keep_ratio = keep_ratio
 
     def init_encoder(self):
         # encoder = resnet50()
@@ -41,7 +42,7 @@ class ViT_NG(pl.LightningModule):
         # print(f"Loaded {self.extra_args['pretrain_ckpt']}")
         # # self.encoder = encoder.eval()
 
-        self.encoder, self.orig_net = create_modified_vitb16(keep_ratio=0.8)
+        self.encoder, self.orig_net = create_modified_vitb16(keep_ratio=self.keep_ratio)
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(), lr=self.lr)

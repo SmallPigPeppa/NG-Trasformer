@@ -54,22 +54,22 @@ class MLP(pl.LightningModule):
         with torch.no_grad():
             x = self.encoder(x)
         out = self.fc(x)
-        # self.energy_values.to(self.device)
-        # Sort the output and assign energy values
-        sorted_indices = torch.argsort(out, dim=1, descending=True)
-        assigned_energies = torch.gather(self.energy_values.expand(out.size(0), -1).to(self.device), 1, sorted_indices)
-        # assigned_energies = assigned_energies * 10000
+        # # self.energy_values.to(self.device)
+        # # Sort the output and assign energy values
+        # sorted_indices = torch.argsort(out, dim=1, descending=True)
+        # assigned_energies = torch.gather(self.energy_values.expand(out.size(0), -1).to(self.device), 1, sorted_indices)
+        # # assigned_energies = assigned_energies * 10000
+        #
+        # # # Normalize the assigned energies with softmax
+        # # normalized_energies = F.softmax(assigned_energies, dim=1)
+        # # # return normalized_energies
+        #
+        # # Normalize the assigned energies by dividing by the sum
+        # sum_energies = assigned_energies.sum(dim=1, keepdim=True)
+        # normalized_energies = assigned_energies / sum_energies
 
-        # # Normalize the assigned energies with softmax
-        # normalized_energies = F.softmax(assigned_energies, dim=1)
-        # # return normalized_energies
-
-        # Normalize the assigned energies by dividing by the sum
-        sum_energies = assigned_energies.sum(dim=1, keepdim=True)
-        normalized_energies = assigned_energies / sum_energies
-
-        out = F.softmax(out, dim=1)
-        y = out - out.detach() + normalized_energies
+        # out = F.softmax(out, dim=1)
+        # y = out - out.detach() + normalized_energies
 
         y = out
 

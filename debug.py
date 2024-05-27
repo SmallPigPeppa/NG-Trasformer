@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import matplotlib.pyplot as plt
 num_class=100
 energy_values = torch.tensor(np.random.normal(size=num_class), dtype=torch.float32)
 print(energy_values)
@@ -19,3 +20,9 @@ energy_values = torch.tensor(normalized_values, dtype=torch.float32)
 
 print(energy_values)
 
+plt.plot(energy_values.numpy(), marker='o')
+plt.title('Energy Values Distribution')
+plt.xlabel('Class Index')
+plt.ylabel('Energy Value')
+plt.grid(True)
+plt.show()

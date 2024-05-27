@@ -9,7 +9,9 @@ from pytorch_lightning.callbacks import LearningRateMonitor
 from utils.encoder_utils import get_pretrained_encoder
 from utils.args_utils import parse_args
 from models.vit_ng import ViT_NG
-
+import timm
+from torchvision import datasets, transforms
+import os
 
 def main():
     seed_everything(5)
@@ -20,11 +22,21 @@ def main():
     model.init_encoder()
 
     # dataset
-    train_dataset, test_dataset = get_dataset(dataset=args.dataset, data_path=args.data_path)
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
-                              shuffle=True, pin_memory=True)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
-                             shuffle=False, pin_memory=True)
+    # train_dataset, test_dataset = get_dataset(dataset=args.dataset, data_path=args.data_path)
+    # train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
+    #                           shuffle=True, pin_memory=True)
+    # test_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers,
+    #                          shuffle=False, pin_memory=True)
+
+    data_config = timm.data.resolve_model_data_config(model.encoder)
+    val_transform = timm.data.create_transform(**data_config, is_training=False)
+    val_dataset = datasets.ImageFolder(root=os.path.join(args.root, 'val'), transform=val_transform)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.works,
+                            shuffle=False, pin_memory=True)
+    # train_transform = timm.data.create_transform(**data_config, is_training=True)
+    # train_dataset = datasets.ImageFolder(root=os.path.join(args.root, 'train'), transform=train_transform)
+    # train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.works,
+    #                           shuffle=True, pin_memory=True)
 
 
     # trainer
@@ -47,7 +59,7 @@ def main():
 
     )
     # trainer.fit(model, train_loader, test_loader)
-    trainer.test(model, test_loader)
+    trainer.test(model, val_loader)
     wandb.finish()
 
 

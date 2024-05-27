@@ -3,3 +3,4 @@ neupy
 ipython
 ipywidgets
 matplotlib
+sklearn

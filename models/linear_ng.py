@@ -21,18 +21,35 @@ class MLP(pl.LightningModule):
         self.acc = Accuracy(num_classes=num_class, task="multiclass", top_k=1)
         self.encoder = None
 
-        # Initialize energy values
-        # self.energy_values = torch.tensor(np.random.normal(size=num_class), dtype=torch.float32, device=self.device)
-        random_values = np.random.rand(num_class)
+        # # Initialize energy values
+        # # self.energy_values = torch.tensor(np.random.normal(size=num_class), dtype=torch.float32, device=self.device)
+        # random_values = np.random.rand(num_class)
+        #
+        # # Step 2: Sort the values in descending order
+        # sorted_values = np.sort(random_values)[::-1]
+        #
+        # # Step 3: Normalize the sorted values to sum to 1
+        # normalized_values = sorted_values / np.sum(sorted_values)
+        #
+        # # Convert to torch tensor
+        # self.energy_values = torch.tensor(normalized_values, dtype=torch.float32, device=self.device)
 
-        # Step 2: Sort the values in descending order
-        sorted_values = np.sort(random_values)[::-1]
+        # 设置随机种子以确保结果可重复
+        torch.manual_seed(0)
+        np.random.seed(0)
 
-        # Step 3: Normalize the sorted values to sum to 1
-        normalized_values = sorted_values / np.sum(sorted_values)
+        num_class = 100
+        temperature = 0.3  # 调整温度系数
 
-        # Convert to torch tensor
-        self.energy_values = torch.tensor(normalized_values, dtype=torch.float32, device=self.device)
+        # 生成服从正态分布的随机值
+        energy_values = np.random.normal(loc=0, scale=1, size=num_class)
+
+        # 使用温度系数调整能量值
+        transformed_energy_values = np.exp(energy_values / temperature)
+        transformed_energy_values = transformed_energy_values / np.sum(transformed_energy_values)
+
+        # 转换为torch tensor
+        self.energy_values = torch.tensor(transformed_energy_values, dtype=torch.float32, device=self.device)
 
     def init_encoder(self):
         encoder = resnet50()

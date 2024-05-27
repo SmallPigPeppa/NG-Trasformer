@@ -48,6 +48,27 @@ def get_dataset(dataset, data_path):
                                              transform=train_tansforms)
         test_dataset = datasets.ImageFolder(root=os.path.join(data_path, "val"),
                                             transform=val_tansforms)
+    elif dataset == "imagenet":
+        mean = [0.485, 0.456, 0.406]
+        std = [0.229, 0.224, 0.225]
+        data_path = os.path.join(data_path, "imagenet")
+        train_tansforms = transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=mean, std=std),
+        ])
+        val_tansforms = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=mean, std=std),
+        ])
+
+        train_dataset = datasets.ImageFolder(root=os.path.join(data_path, "train"),
+                                             transform=train_tansforms)
+        test_dataset = datasets.ImageFolder(root=os.path.join(data_path, "val"),
+                                            transform=val_tansforms)
 
     return train_dataset, test_dataset
 

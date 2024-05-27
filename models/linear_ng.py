@@ -35,17 +35,15 @@ class MLP(pl.LightningModule):
         # self.energy_values = torch.tensor(normalized_values, dtype=torch.float32, device=self.device)
 
         # 设置随机种子以确保结果可重复
-        torch.manual_seed(0)
-        np.random.seed(0)
-
         num_class = 100
         temperature = 0.3  # 调整温度系数
 
-        # 生成服从正态分布的随机值
-        energy_values = np.random.normal(loc=0, scale=1, size=num_class)
+        # 生成随机值并排序
+        raw_values = np.random.uniform(size=num_class)
+        sorted_values = np.sort(raw_values)[::-1]
 
         # 使用温度系数调整能量值
-        transformed_energy_values = np.exp(energy_values / temperature)
+        transformed_energy_values = np.exp(sorted_values / temperature)
         transformed_energy_values = transformed_energy_values / np.sum(transformed_energy_values)
 
         # 转换为torch tensor

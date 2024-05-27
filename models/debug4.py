@@ -62,10 +62,10 @@ class ModifiedVisionTransformer(VisionTransformer):
 
         # x = x + self.drop_path1(self.ls1(self.attn(self.norm1(x))))
         x_attn = _filter_attn(blk.norm1(x))
-        x = x + self.drop_path1(self.ls1(x_attn))
+        x = x + blk.drop_path1(blk.ls1(x_attn))
 
         # x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
-        x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
+        x = x + blk.drop_path2(blk.ls2(blk.mlp(blk.norm2(x))))
 
         return x
 

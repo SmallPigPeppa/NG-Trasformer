@@ -22,7 +22,17 @@ class MLP(pl.LightningModule):
         self.encoder = None
 
         # Initialize energy values
-        self.energy_values = torch.tensor(np.random.normal(size=num_class), dtype=torch.float32, device=self.device)
+        # self.energy_values = torch.tensor(np.random.normal(size=num_class), dtype=torch.float32, device=self.device)
+        random_values = np.random.rand(num_class)
+
+        # Step 2: Sort the values in descending order
+        sorted_values = np.sort(random_values)[::-1]
+
+        # Step 3: Normalize the sorted values to sum to 1
+        normalized_values = sorted_values / np.sum(sorted_values)
+
+        # Convert to torch tensor
+        self.energy_values = torch.tensor(normalized_values, dtype=torch.float32, device=self.device)
 
     def init_encoder(self):
         encoder = resnet50()
@@ -56,8 +66,8 @@ class MLP(pl.LightningModule):
         out = self.fc(x)
         # # self.energy_values.to(self.device)
         # # Sort the output and assign energy values
-        # sorted_indices = torch.argsort(out, dim=1, descending=True)
-        # assigned_energies = torch.gather(self.energy_values.expand(out.size(0), -1).to(self.device), 1, sorted_indices)
+        sorted_indices = torch.argsort(out, dim=1, descending=True)
+        assigned_energies = torch.gather(self.energy_values.expand(out.size(0), -1).to(self.device), 1, sorted_indices)
         # # assigned_energies = assigned_energies * 10000
         #
         # # # Normalize the assigned energies with softmax
@@ -69,9 +79,9 @@ class MLP(pl.LightningModule):
         # normalized_energies = assigned_energies / sum_energies
 
         # out = F.softmax(out, dim=1)
-        # y = out - out.detach() + normalized_energies
+        y = out - out.detach() + assigned_energies
 
-        y = out
+        # y = out
 
         return y
 

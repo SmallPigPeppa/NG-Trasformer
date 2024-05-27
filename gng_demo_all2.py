@@ -56,7 +56,6 @@ def generate_data(distribution_type, n_samples=10000, n_clusters=4, cluster_std=
 
 def plot_and_save_distribution(data, labels, distribution_type, distribution_dir):
     """Plot and save the distribution data."""
-    plt.clf()
     plt.scatter(data[:, 0], data[:, 1], c=labels, cmap='viridis')
     plt.savefig(os.path.join(distribution_dir, f'{distribution_type}_distribution.png'))
     plt.show()
@@ -124,6 +123,6 @@ if __name__ == "__main__":
 
         data, labels = generate_data(distribution_type)
         plot_and_save_distribution(data, labels, distribution_type, distribution_dir)
-        #
-        # gng = initialize_gng()
-        # animate_gng(data, labels, gng, distribution_dir)
+
+        gng = initialize_gng()
+        animate_gng(data, labels, gng, distribution_dir)

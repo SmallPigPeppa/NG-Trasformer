@@ -4,6 +4,7 @@ import timm
 from timm.models.vision_transformer import VisionTransformer
 from timm import create_model
 from timm.models._manipulate import checkpoint_seq
+import torch.nn.functional as F
 
 
 class ModifiedVisionTransformer(VisionTransformer):
@@ -34,12 +35,37 @@ class ModifiedVisionTransformer(VisionTransformer):
         return x
 
     def forward_block_with_filter_old(self, blk, x):
-        # Apply normalization
-        x_norm1 = blk.norm1(x)
-        x_attn = blk.attn(x_norm1)
+
+        def filter_attn(x):
+            attn_model = blk.attn
+            B, N, C = x.shape
+            qkv = attn_model.qkv(x).reshape(B, N, 3, attn_model.num_heads, attn_model.head_dim).permute(2, 0, 3, 1, 4)
+            q, k, v = qkv.unbind(0)
+            q, k = attn_model.q_norm(q), attn_model.k_norm(k)
+
+            if attn_model.fused_attn:
+                x = F.scaled_dot_product_attention(
+                    q, k, v,
+                    dropout_p=attn_model.attn_drop.p if attn_model.training else 0.,
+                )
+            else:
+                q = q * attn_model.scale
+                attn = q @ k.transpose(-2, -1)
+                attn = attn.softmax(dim=-1)
+                attn = attn_model.attn_drop(attn)
+                x = attn @ v
+
+            x = x.transpose(1, 2).reshape(B, N, C)
+            x = attn_model.proj(x)
+            x = attn_model.proj_drop(x)
+            return x
+
+
+        # x = x + self.drop_path1(self.ls1(self.attn(self.norm1(x))))
+        x_attn = filter_attn(blk.norm1(x))
         x = x + self.drop_path1(self.ls1(x_attn))
 
-        # MLP part
+        # x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
         x = x + self.drop_path2(self.ls2(self.mlp(self.norm2(x))))
 
         return x

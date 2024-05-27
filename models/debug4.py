@@ -11,7 +11,6 @@ class ModifiedVisionTransformer(VisionTransformer):
         super(ModifiedVisionTransformer, self).__init__(*args, **kwargs)
         self.keep_ratio = keep_ratio
 
-
     def forward_features(self, x: torch.Tensor) -> torch.Tensor:
         x = self.patch_embed(x)
         x = self._pos_embed(x)
@@ -26,6 +25,10 @@ class ModifiedVisionTransformer(VisionTransformer):
         return x
 
     def forward_block_with_filter(self, blk, x):
+        x = blk(x)
+        return x
+
+    def forward_block_with_filter_old(self, blk, x):
         # Apply normalization
         x_norm = blk.norm1(x)
 
@@ -68,14 +71,14 @@ class ModifiedVisionTransformer(VisionTransformer):
 # 初始化并加载预训练权重
 def create_modified_vitb16(keep_ratio=0.8):
     model = ModifiedVisionTransformer(img_size=224, patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4,
-                                      qkv_bias=True, norm_layer=nn.LayerNorm, keep_ratio=keep_ratio,num_classes=1000)
-    weights='vit_base_patch16_224.augreg2_in21k_ft_in1k'
+                                      qkv_bias=True, norm_layer=nn.LayerNorm, keep_ratio=keep_ratio, num_classes=1000)
+    weights = 'vit_base_patch16_224.augreg2_in21k_ft_in1k'
     print(f"Loading weights {weights}")
     orig_net = create_model(weights, pretrained=True)
     state_dict = orig_net.state_dict()
     model.load_state_dict(state_dict, strict=True)
     # return orig_net
-    return model,orig_net
+    return model, orig_net
 
 
 # 创建模型

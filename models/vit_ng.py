@@ -8,9 +8,9 @@ from torchmetrics.classification.accuracy import Accuracy
 from debug4 import create_modified_vitb16
 
 
-class MLP(pl.LightningModule):
+class ViT_NG(pl.LightningModule):
     def __init__(self, dim_feature, num_class, lr, epochs, warmup_epochs, **kwargs):
-        super(MLP, self).__init__()
+        super(ViT_NG, self).__init__()
         self.dim_feature = dim_feature
         self.num_class = num_class
         self.lr = lr
@@ -88,4 +88,4 @@ if __name__ == '__main__':
     from utils.args_utils import parse_args
 
     args = parse_args()
-    model = MLP(**args.__dict__)
+    model = ViT_NG(**args.__dict__)

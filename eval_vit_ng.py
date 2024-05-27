@@ -8,7 +8,7 @@ from utils.dataset_utils import get_dataset
 from pytorch_lightning.callbacks import LearningRateMonitor
 from utils.encoder_utils import get_pretrained_encoder
 from utils.args_utils import parse_args
-from models.linear_vit_ng import MLP
+from models.vit_ng import ViT_NG
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
     args = parse_args()
 
     # model
-    model = MLP(**args.__dict__)
+    model = ViT_NG(**args.__dict__)
     model.init_encoder()
 
     # dataset

@@ -64,4 +64,5 @@ def create_modified_vitb16(keep_ratio=0.8):
 
 
 # 创建模型
+
 model = create_modified_vitb16(keep_ratio=0.8)

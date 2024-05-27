@@ -53,7 +53,7 @@ class ModifiedVisionTransformer(VisionTransformer):
 # 初始化并加载预训练权重
 def create_modified_vitb16(keep_ratio=0.8):
     model = ModifiedVisionTransformer(img_size=224, patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4,
-                                      qkv_bias=True, norm_layer=nn.LayerNorm, keep_ratio=keep_ratio)
+                                      qkv_bias=True, norm_layer=nn.LayerNorm, keep_ratio=keep_ratio,num_classes=1000)
     weights='vit_base_patch16_224.augreg2_in21k_ft_in1k'
     print(f"Loading weights {weights}")
     orig_net = create_model(weights, pretrained=True)

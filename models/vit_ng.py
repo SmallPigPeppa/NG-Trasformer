@@ -5,7 +5,7 @@ from torch.nn import functional as F
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 from torchvision.models import resnet50
 from torchmetrics.classification.accuracy import Accuracy
-from debug4 import create_modified_vitb16
+from .debug4 import create_modified_vitb16
 
 
 class ViT_NG(pl.LightningModule):

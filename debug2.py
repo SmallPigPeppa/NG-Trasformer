@@ -7,7 +7,7 @@ torch.manual_seed(0)
 np.random.seed(0)
 
 num_class = 100
-temperature = 0.1  # 调整温度系数
+temperature = 0.5  # 调整温度系数
 
 # 生成随机值并排序
 raw_values = np.random.uniform(size=num_class)
@@ -28,4 +28,5 @@ plt.plot(energy_values_tensor.numpy())
 plt.title(f'Sorted Energy Values (Temperature = {temperature})')
 plt.xlabel('Index')
 plt.ylabel('Energy Value')
+plt.savefig('demo.jpg')
 plt.show()

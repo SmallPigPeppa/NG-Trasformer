@@ -100,6 +100,17 @@ class MLP(pl.LightningModule):
 
         return y
 
+
+    def forward_ng(self, x):
+        with torch.no_grad():
+            x = self.encoder(x)
+        out = self.fc(x)
+        sorted_indices = torch.argsort(out, dim=1, descending=True)
+        assigned_energies = torch.gather(self.energy_values.expand(out.size(0), -1).to(self.device), 1, sorted_indices)
+        y = out - out.detach() + assigned_energies
+
+        return y
+
     def share_step(self, batch, batch_idx):
         x, targets = batch
         logits = self.forward(x)

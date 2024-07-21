@@ -2,7 +2,7 @@ python cli_resnet50.py fit \
     --data.batch_size 256 \
     --data.num_workers 8\
     --data.path /home/ma-user/work/wenzhuoliu/torch_ds/imagenet \
-    --model.weight resnet50 \
+    --model.weights IMAGENET1K_V1 \
     --model.num_classes 1000 \
     --model.temperature 1.0 \
     --model.lr 1e-3 \

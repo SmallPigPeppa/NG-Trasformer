@@ -1,16 +1,17 @@
 import torch
 from torch import nn
-from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 from torchvision.models import resnet50
-from lightning import LightningModule
 from torchmetrics.classification.accuracy import Accuracy
+from lightning import LightningModule
+from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
+from typing import Optional
 
 
 class VisionModel(LightningModule):
     def __init__(
             self,
             model_alias: str,
-            weights: str = None,
+            weights: Optional[str] = None,
             embedding_dims: int = 2048,
             num_classes: int = 1000,
             temperature: float = 1.0,
@@ -23,7 +24,9 @@ class VisionModel(LightningModule):
     ) -> None:
         super().__init__(*args, **kwargs)
         self.save_hyperparameters()
-        self.model = resnet50(weights=self.hparams.weights)
+        self.model = resnet50(
+            weights=self.hparams.weights
+        )
         self.loss = nn.CrossEntropyLoss()
         self.acc = Accuracy(
             num_classes=self.hparams.num_classes,

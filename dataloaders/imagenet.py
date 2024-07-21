@@ -2,7 +2,7 @@ import os
 import timm
 from typing import Optional
 from torchvision import transforms
-from torch.utils.data import random_split, DataLoader, Subset
+from torch.utils.data import DataLoader
 from lightning import LightningDataModule
 from torchvision.datasets import ImageFolder
 

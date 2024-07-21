@@ -10,7 +10,7 @@ class VisionModel(LightningModule):
     def __init__(
             self,
             model_alias: str,
-            pretrained: bool = True,
+            weights: str = None,
             embedding_dims: int = 2048,
             num_classes: int = 1000,
             temperature: float = 1.0,

@@ -1,0 +1,22 @@
+python cli_resnet50.py fit \
+    --data.batch_size 256 \
+    --data.num_workers 8\
+    --data.path /home/ma-user/work/wenzhuoliu/torch_ds/imagenet \
+    --model.weight resnet50 \
+    --model.num_classes 1000 \
+    --model.temperature 1.0 \
+    --model.lr 1e-3 \
+    --model.lr_warmup_epochs 5 \
+    --model.weight_decay 5e-4 \
+    --trainer.accelerator npu \
+    --trainer.precision 16 \
+    --trainer.max_epochs 80 \
+    --trainer.log_every_n_steps 1 \
+    --trainer.logger WandbLogger \
+    --trainer.logger.project NG-Transformer \
+    --trainer.logger.name resnet50 \
+    --trainer.logger.log_model False \
+    --lr_monitor.logging_interval epoch \
+    --model_checkpoint.dirpath ckpt \
+    --model_checkpoint.filename resnet50 \
+    --model_checkpoint.save_weights_only True

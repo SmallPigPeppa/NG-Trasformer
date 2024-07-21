@@ -40,7 +40,7 @@ class VisionModel(LightningModule):
     def training_step(self, batch, batch_idx):
         x, labels = batch
         logits = self.model(x)
-        loss = self.ce_loss(logits, labels)
+        loss = self.loss(logits, labels)
         acc = self.acc(logits, labels)
         self.log('train/loss', loss, sync_dist=True)
         self.log('train/acc', acc, sync_dist=True)
@@ -49,7 +49,7 @@ class VisionModel(LightningModule):
     def validation_step(self, batch, batch_idx):
         x, labels = batch
         logits = self.model(x)
-        loss = self.ce_loss(logits, labels)
+        loss = self.loss(logits, labels)
         acc = self.acc(logits, labels)
         self.log('val/loss', loss, sync_dist=True)
         self.log('val/acc', acc, sync_dist=True)

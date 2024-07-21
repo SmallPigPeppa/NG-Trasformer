@@ -49,11 +49,16 @@ class VisionModel(LightningModule):
         return loss
 
     def configure_optimizers(self):
-        optimizer = torch.optim.SGD(
+        # optimizer = torch.optim.SGD(
+        #     self.parameters(),
+        #     lr=self.hparams.lr,
+        #     weight_decay=self.hparams.weight_decay,
+        #     momentum=0.9
+        # )
+        optimizer = torch.optim.AdamW(
             self.parameters(),
             lr=self.hparams.lr,
             weight_decay=self.hparams.weight_decay,
-            momentum=0.9
         )
         lr_scheduler = LinearWarmupCosineAnnealingLR(
             optimizer,
@@ -66,4 +71,3 @@ class VisionModel(LightningModule):
             "optimizer": optimizer,
             "lr_scheduler": lr_scheduler,
         }
-

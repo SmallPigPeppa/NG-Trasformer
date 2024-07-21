@@ -23,9 +23,13 @@ class VisionModel(LightningModule):
     ) -> None:
         super().__init__(*args, **kwargs)
         self.save_hyperparameters()
-        self.model = resnet50(pretrained=self.hparams.pretrained)
+        self.model = resnet50(weights=self.hparams.weights)
         self.loss = nn.CrossEntropyLoss()
-        self.acc = Accuracy(num_classes=self.hparams.num_classes, task="multiclass", top_k=1)
+        self.acc = Accuracy(
+            num_classes=self.hparams.num_classes,
+            task="multiclass",
+            top_k=1
+        )
 
     def forward(self, x):
         return self.model(x)
